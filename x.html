@@ -2,31 +2,56 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Iframe desde URL</title>
+<title>Embed YouTube desde URL</title>
 <style>
-  html, body, iframe {
-    margin: 0; padding: 0; height: 100%; width: 100%;
-    border: none;
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%; background: #000;
+    display: flex; justify-content: center; align-items: center;
   }
   iframe {
-    display: block;
+    width: 100vw; 
+    height: 100vh;
+    border: none;
+  }
+  .mensaje {
+    color: white;
+    font-family: monospace;
   }
 </style>
 </head>
 <body>
 
+<div id="container"></div>
+
 <script>
   const params = new URLSearchParams(window.location.search);
-  const url = params.get('link');
+  const link = params.get('link');
 
-  if(url) {
-    const iframe = document.createElement('iframe');
-    // Si la URL no tiene protocolo, agregamos https:// para evitar errores
-    const fullUrl = url.match(/^https?:\/\//) ? url : 'https://' + url;
-    iframe.src = fullUrl;
-    document.body.appendChild(iframe);
+  function extraerIdYoutube(url) {
+    // Extrae ID de video de URL YouTube estándar o corta
+    if (!url) return null;
+    let id = null;
+    // URL típica
+    const regExp = /(?:youtube\.com\/.*v=|youtu\.be\/)([^&?/]+)/;
+    const match = url.match(regExp);
+    if (match && match[1]) id = match[1];
+    else if (/^[\w-]{11}$/.test(url)) id = url; // Si solo pasan el id
+    return id;
+  }
+
+  if(link) {
+    const idVideo = extraerIdYoutube(link);
+    if(idVideo) {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${idVideo}?autoplay=1&rel=0`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      document.getElementById('container').appendChild(iframe);
+    } else {
+      document.getElementById('container').innerHTML = `<p class="mensaje">El parámetro <code>link</code> no es un video válido de YouTube.</p>`;
+    }
   } else {
-    document.body.innerHTML = '<h2>No se encontró el parámetro <code>link</code> en la URL.</h2>';
+    document.getElementById('container').innerHTML = `<p class="mensaje">No se encontró el parámetro <code>link</code> en la URL.</p>`;
   }
 </script>
 
