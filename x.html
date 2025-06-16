@@ -2,50 +2,33 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Ejemplo Parámetros URL</title>
+<title>Iframe desde URL</title>
+<style>
+  html, body, iframe {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    border: none;
+  }
+  iframe {
+    display: block;
+  }
+</style>
 </head>
 <body>
 
-  <h1 id="titulo">Título por defecto</h1>
-  <p id="descripcion">Descripción por defecto</p>
-  <input id="inputNombre" type="text" placeholder="Nombre aquí" />
-  <img id="imagenEjemplo" src="https://placekitten.com/200/200" alt="Ejemplo imagen" />
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const url = params.get('link');
 
-  <script>
-    // Funciones definidas antes
-    function getUrlParams() {
-      const params = new URLSearchParams(window.location.search);
-      const result = {};
-      for (const [key, value] of params.entries()) {
-        result[key] = value;
-      }
-      return result;
-    }
-
-    function asignarTexto(idElemento, texto) {
-      const el = document.getElementById(idElemento);
-      if (el) el.textContent = texto;
-    }
-
-    function asignarValorInput(idInput, valor) {
-      const el = document.getElementById(idInput);
-      if (el) el.value = valor;
-    }
-
-    function asignarImagen(idImg, urlImg) {
-      const el = document.getElementById(idImg);
-      if (el && el.tagName.toLowerCase() === 'img') el.src = urlImg;
-    }
-
-    // Uso
-    const params = getUrlParams();
-
-    if (params.titulo) asignarTexto("titulo", params.titulo);
-    if (params.descripcion) asignarTexto("descripcion", params.descripcion);
-    if (params.nombre) asignarValorInput("inputNombre", params.nombre);
-    if (params.img) asignarImagen("imagenEjemplo", params.img);
-
-  </script>
+  if(url) {
+    const iframe = document.createElement('iframe');
+    // Si la URL no tiene protocolo, agregamos https:// para evitar errores
+    const fullUrl = url.match(/^https?:\/\//) ? url : 'https://' + url;
+    iframe.src = fullUrl;
+    document.body.appendChild(iframe);
+  } else {
+    document.body.innerHTML = '<h2>No se encontró el parámetro <code>link</code> en la URL.</h2>';
+  }
+</script>
 
 </body>
 </html>
