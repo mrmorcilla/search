@@ -1,85 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Búsqueda Rápida</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #1e1e1e;
-      color: #f0f0f0;
-      padding: 20px;
-    }
-    img {
-      max-width: 300px;
-      margin: 10px;
-      border-radius: 10px;
-      box-shadow: 0 0 5px #000;
-    }
-    .txt-box {
-      max-width: 700px;
-      margin-bottom: 30px;
-      background: #333;
-      padding: 15px;
-      border-radius: 8px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Ejemplo Parámetros URL</title>
 </head>
 <body>
-  <h1>Resultados:</h1>
-  <div id="resultados">Cargando...</div>
+
+  <h1 id="titulo">Título por defecto</h1>
+  <p id="descripcion">Descripción por defecto</p>
+  <input id="inputNombre" type="text" placeholder="Nombre aquí" />
+  <img id="imagenEjemplo" src="https://placekitten.com/200/200" alt="Ejemplo imagen" />
 
   <script>
-    const UNSPLASH_KEY = "TU_CLAVE_UNSPLASH";  // ⚠️ Cambiar por tu clave real
-
-    const params = new URLSearchParams(location.search);
-    const tag = params.get("tag") || "gatitos";
-    const type = params.get("type") || "img";
-    const len = parseInt(params.get("len")) || 1;
-    const contenedor = document.getElementById("resultados");
-
-    contenedor.innerHTML = "";
-
-    // 🔍 Mostrar texto desde Wikipedia
-    async function cargarTexto() {
-      try {
-        const res = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${tag}`);
-        const data = await res.json();
-        const box = document.createElement("div");
-        box.className = "txt-box";
-        box.innerHTML = `<h2>${data.title}</h2><p>${data.extract}</p>`;
-        contenedor.appendChild(box);
-      } catch (e) {
-        contenedor.innerHTML += `<p>Error al cargar texto.</p>`;
+    // Funciones definidas antes
+    function getUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const result = {};
+      for (const [key, value] of params.entries()) {
+        result[key] = value;
       }
+      return result;
     }
 
-    // 🖼️ Mostrar imágenes desde Unsplash
-    async function cargarImagenes() {
-      try {
-        const res = await fetch(`https://api.unsplash.com/search/photos?query=${tag}&per_page=${len}&client_id=${UNSPLASH_KEY}`);
-        const data = await res.json();
-        data.results.forEach(img => {
-          const imagen = document.createElement("img");
-          imagen.src = img.urls.small;
-          contenedor.appendChild(imagen);
-        });
-      } catch (e) {
-        contenedor.innerHTML += `<p>Error al cargar imágenes.</p>`;
-      }
+    function asignarTexto(idElemento, texto) {
+      const el = document.getElementById(idElemento);
+      if (el) el.textContent = texto;
     }
 
-    // 🧠 Controlador principal
-    if (type === "txt") {
-      cargarTexto();
-    } else if (type === "img") {
-      cargarImagenes();
-    } else if (type === "img-txt") {
-      cargarTexto();
-      cargarImagenes();
-    } else {
-      contenedor.innerHTML = "<p>Tipo no reconocido.</p>";
+    function asignarValorInput(idInput, valor) {
+      const el = document.getElementById(idInput);
+      if (el) el.value = valor;
     }
+
+    function asignarImagen(idImg, urlImg) {
+      const el = document.getElementById(idImg);
+      if (el && el.tagName.toLowerCase() === 'img') el.src = urlImg;
+    }
+
+    // Uso
+    const params = getUrlParams();
+
+    if (params.titulo) asignarTexto("titulo", params.titulo);
+    if (params.descripcion) asignarTexto("descripcion", params.descripcion);
+    if (params.nombre) asignarValorInput("inputNombre", params.nombre);
+    if (params.img) asignarImagen("imagenEjemplo", params.img);
+
   </script>
+
 </body>
 </html>
