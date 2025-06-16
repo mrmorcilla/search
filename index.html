@@ -1,1 +1,77 @@
-mrmorcilla.github.io/search/x.html?tag=example&type=img-or-txt&len=1
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Multi modo: Video o Juego</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: #111;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white;
+    font-family: monospace;
+  }
+  #container {
+    width: 100vw;
+    height: 100vh;
+  }
+  iframe, #gameFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+</head>
+<body>
+  <div id="container"></div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get('type');
+  const run = params.get('run');
+
+  function extraerIdYoutube(url) {
+    if (!url) return null;
+    let id = null;
+    const regExp = /(?:youtube\.com\/.*v=|youtu\.be\/)([^&?/]+)/;
+    const match = url.match(regExp);
+    if (match && match[1]) id = match[1];
+    else if (/^[\w-]{11}$/.test(url)) id = url;
+    return id;
+  }
+
+  const container = document.getElementById('container');
+
+  if (!type || !run) {
+    container.innerHTML = '<p>Faltan parámetros <code>type</code> o <code>run</code>.</p>';
+  } else if (type === 'ytvideo') {
+    const idVideo = extraerIdYoutube(run);
+    if (!idVideo) {
+      container.innerHTML = '<p>Parámetro <code>run</code> no válido para video YouTube.</p>';
+    } else {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${idVideo}?autoplay=1&rel=0`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      container.appendChild(iframe);
+    }
+  } else if (type === 'game') {
+    // run contiene todo el html+js comprimido en una sola línea
+    // Creamos un iframe sandbox para correr el juego
+    const iframe = document.createElement('iframe');
+    iframe.id = 'gameFrame';
+    iframe.sandbox = "allow-scripts allow-same-origin";
+    container.appendChild(iframe);
+
+    // Inyectamos el código html/JS dentro del iframe
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(run);
+    doc.close();
+
+  } else {
+    container.innerHTML = '<p>Parámetro <code>type</code> desconocido.</p>';
+  }
+</script>
+</body>
+</html>
