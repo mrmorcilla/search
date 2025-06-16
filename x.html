@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Búsqueda Rápida</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1e1e1e;
+      color: #f0f0f0;
+      padding: 20px;
+    }
+    img {
+      max-width: 300px;
+      margin: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 5px #000;
+    }
+    .txt-box {
+      max-width: 700px;
+      margin-bottom: 30px;
+      background: #333;
+      padding: 15px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Resultados:</h1>
+  <div id="resultados">Cargando...</div>
+
+  <script>
+    const UNSPLASH_KEY = "TU_CLAVE_UNSPLASH";  // ⚠️ Cambiar por tu clave real
+
+    const params = new URLSearchParams(location.search);
+    const tag = params.get("tag") || "gatitos";
+    const type = params.get("type") || "img";
+    const len = parseInt(params.get("len")) || 1;
+    const contenedor = document.getElementById("resultados");
+
+    contenedor.innerHTML = "";
+
+    // 🔍 Mostrar texto desde Wikipedia
+    async function cargarTexto() {
+      try {
+        const res = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${tag}`);
+        const data = await res.json();
+        const box = document.createElement("div");
+        box.className = "txt-box";
+        box.innerHTML = `<h2>${data.title}</h2><p>${data.extract}</p>`;
+        contenedor.appendChild(box);
+      } catch (e) {
+        contenedor.innerHTML += `<p>Error al cargar texto.</p>`;
+      }
+    }
+
+    // 🖼️ Mostrar imágenes desde Unsplash
+    async function cargarImagenes() {
+      try {
+        const res = await fetch(`https://api.unsplash.com/search/photos?query=${tag}&per_page=${len}&client_id=${UNSPLASH_KEY}`);
+        const data = await res.json();
+        data.results.forEach(img => {
+          const imagen = document.createElement("img");
+          imagen.src = img.urls.small;
+          contenedor.appendChild(imagen);
+        });
+      } catch (e) {
+        contenedor.innerHTML += `<p>Error al cargar imágenes.</p>`;
+      }
+    }
+
+    // 🧠 Controlador principal
+    if (type === "txt") {
+      cargarTexto();
+    } else if (type === "img") {
+      cargarImagenes();
+    } else if (type === "img-txt") {
+      cargarTexto();
+      cargarImagenes();
+    } else {
+      contenedor.innerHTML = "<p>Tipo no reconocido.</p>";
+    }
+  </script>
+</body>
+</html>
