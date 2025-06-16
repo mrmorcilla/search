@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Multi modo: Video o Juego</title>
+<title>Ejecuter3000 - morci</title>
 <style>
   html, body {
     margin: 0; padding: 0; height: 100%; width: 100%;
@@ -27,8 +27,8 @@
 
 <script>
   const params = new URLSearchParams(window.location.search);
-  const type = params.get('type');
-  const run = params.get('run');
+  const type = params.get('t');
+  const run = params.get('r');
 
   function extraerIdYoutube(url) {
     if (!url) return null;
@@ -44,7 +44,7 @@
 
   if (!type || !run) {
     container.innerHTML = '<p>Faltan parámetros <code>type</code> o <code>run</code>.</p>';
-  } else if (type === 'ytvideo') {
+  } else if (type === 'yt') {
     const idVideo = extraerIdYoutube(run);
     if (!idVideo) {
       container.innerHTML = '<p>Parámetro <code>run</code> no válido para video YouTube.</p>';
@@ -55,7 +55,7 @@
       iframe.allowFullscreen = true;
       container.appendChild(iframe);
     }
-  } else if (type === 'game') {
+  } else if (type === 'js') {
     // run contiene todo el html+js comprimido en una sola línea
     // Creamos un iframe sandbox para correr el juego
     const iframe = document.createElement('iframe');
